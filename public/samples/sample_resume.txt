@@ -1,0 +1,73 @@
+Alex Morgan
+Email: alex.morgan@email.com | Phone: (555) 012-3456
+LinkedIn: linkedin.com/in/alexmorgan | GitHub: github.com/alexmorgan
+Location: San Francisco, CA 94105
+
+PROFESSIONAL SUMMARY
+Results-driven Full Stack Software Engineer with 6+ years of experience designing and building
+scalable web applications. Proven track record delivering high-impact products in fast-paced
+startup and enterprise environments. Strong communicator comfortable leading cross-functional
+teams and mentoring junior engineers.
+
+SKILLS
+Languages:     Python, TypeScript, JavaScript, PHP, SQL, Go
+Frameworks:    React, Next.js, Laravel, Node.js, FastAPI, Django
+Infrastructure: AWS (EC2, S3, RDS, Lambda), Docker, Kubernetes, Terraform, GitHub Actions
+Databases:     PostgreSQL, MySQL, Redis, MongoDB, Elasticsearch
+Other:         REST APIs, GraphQL, Agile/Scrum, TDD, CI/CD, System Design
+
+EXPERIENCE
+
+Senior Software Engineer
+TechFlow Inc. — San Francisco, CA
+March 2022 – Present
+- Led architecture and development of a real-time analytics dashboard serving 2M+ daily active users, reducing page load time by 62% through Redis caching and query optimisation.
+- Designed and shipped a multi-tenant SaaS billing module integrated with Stripe, processing $4M+ MRR with 99.98% uptime.
+- Mentored 4 junior engineers through weekly 1:1s and code reviews; two were promoted within 12 months.
+- Drove migration from monolithic PHP app to microservices (Go + Kubernetes), cutting infrastructure costs by 35%.
+- Championed adoption of automated testing (Jest + PHPUnit), raising overall test coverage from 22% to 78%.
+
+Software Engineer
+Nexus Digital — Remote
+August 2019 – February 2022
+- Built and maintained RESTful APIs consumed by iOS, Android, and web clients with < 80 ms median latency.
+- Collaborated with product and design to deliver 12 major feature releases across 3 years on a 2-week sprint cadence.
+- Implemented an ML-powered search feature using Elasticsearch, improving search relevance score by 41%.
+- Reduced cloud spend by $18k/year by right-sizing EC2 instances and introducing S3 lifecycle policies.
+
+Junior Software Engineer
+BrightSpark Solutions — Austin, TX
+June 2017 – July 2019
+- Developed customer-facing e-commerce features in Laravel/Vue.js for a platform with 50k registered users.
+- Wrote unit and integration tests achieving 70% coverage on all new modules.
+- Participated in on-call rotation, reducing mean time to resolution (MTTR) from 4 hours to 45 minutes.
+
+EDUCATION
+
+Bachelor of Science in Computer Science
+University of Texas at Austin — Austin, TX
+Graduated: May 2017 | GPA: 3.8 / 4.0
+Relevant Coursework: Algorithms & Data Structures, Operating Systems, Database Systems, Software Engineering, Computer Networks
+
+CERTIFICATIONS
+- AWS Certified Solutions Architect – Associate (2023)
+- Google Cloud Professional Data Engineer (2022)
+- Certified Scrum Master (CSM) – Scrum Alliance (2021)
+
+PROJECTS
+
+OpenMetrics (open source)
+github.com/alexmorgan/openmetrics
+A self-hosted application performance monitoring tool built with Go and React. 1.2k GitHub stars.
+Features custom dashboards, alerting via webhooks, and a Prometheus-compatible scrape endpoint.
+
+ResumeAI (side project)
+Trained a fine-tuned BERT model on 50k labelled resumes to extract structured JSON from free-text CVs.
+Achieved 94% F1-score on held-out test set. API deployed on AWS Lambda with <200 ms cold start.
+
+VOLUNTEER & LEADERSHIP
+- Lead instructor, Code for Good bootcamp (2021–present): teach web development to underrepresented adults
+- Organiser, SF Python Meetup (2020–present): coordinate monthly events for 300+ member community
+
+LANGUAGES
+English (native), Spanish (professional working proficiency), Mandarin (conversational)
