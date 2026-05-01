@@ -39,6 +39,17 @@
             </div>
         @else
             @include('candidate.resumes.analysis', ['analysis' => $analysis, 'resume' => $resume])
+
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex justify-between items-center gap-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">AI-Powered Interview Questions</h3>
+                    <p class="text-sm text-gray-600 mt-1">Generate practice interview questions tailored to this resume.</p>
+                </div>
+                <a href="{{ route('candidate.interview-questions.show', $resume) }}"
+                   class="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 whitespace-nowrap">
+                    Open
+                </a>
+            </div>
         @endif
     </div>
 </x-app-layout>

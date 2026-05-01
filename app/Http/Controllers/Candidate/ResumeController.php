@@ -85,7 +85,10 @@ class ResumeController extends Controller
     {
         $this->authorizeOwner($request, $resume);
         $resume->load('analyses', 'latestAnalysis');
-        return view('candidate.resumes.show', ['resume' => $resume, 'analysis' => $resume->latestAnalysis]);
+        return view('candidate.resumes.show', [
+            'resume' => $resume,
+            'analysis' => $resume->latestAnalysis,
+        ]);
     }
 
     public function reanalyze(Request $request, Resume $resume)

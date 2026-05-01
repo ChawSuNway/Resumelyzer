@@ -112,6 +112,34 @@
             </div>
         @endif
 
+        {{-- AI-powered interview questions --}}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex justify-between items-start gap-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">AI-Powered Interview Questions</h3>
+                    <p class="text-sm text-gray-600 mt-1">Generate interview questions tailored to this resume — optionally for a specific job posting.</p>
+                </div>
+                <form method="POST" action="{{ route('recruiter.candidates.interview-questions.store', $resume) }}" class="flex gap-2">
+                    @csrf
+                    @if ($jobs->isNotEmpty())
+                        <select name="job_posting_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                            <option value="">— No specific role —</option>
+                            @foreach ($jobs as $job)
+                                <option value="{{ $job->id }}">{{ $job->title }}</option>
+                            @endforeach
+                        </select>
+                    @endif
+                    <button type="submit" class="px-4 py-2 rounded-md bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700 whitespace-nowrap">
+                        {{ $interviewSet ? 'Regenerate' : 'Generate' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        @if ($interviewSet)
+            <x-interview-questions :set="$interviewSet" />
+        @endif
+
         {{-- Recruiter notes --}}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 class="text-base font-semibold text-gray-900 mb-4">My Notes</h3>

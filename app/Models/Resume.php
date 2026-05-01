@@ -46,4 +46,14 @@ class Resume extends Model
     {
         return $this->hasOne(ResumeAnalysis::class)->latestOfMany();
     }
+
+    public function interviewQuestionSets(): HasMany
+    {
+        return $this->hasMany(InterviewQuestionSet::class);
+    }
+
+    public function latestInterviewQuestionSet(): HasOne
+    {
+        return $this->hasOne(InterviewQuestionSet::class)->latestOfMany();
+    }
 }

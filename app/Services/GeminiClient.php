@@ -53,7 +53,10 @@ class GeminiClient
             /** @var Response $response */
             $response = Http::timeout($timeout)
                 ->connectTimeout($connectTimeout)
-                ->retry(max(1, $retries), 1500, function ($exception) {
+                ->retry(max(1, $retries), function (int $attempt) {
+                    // Exponential-ish backoff: 1s, 3s, 6s, 10s. Helps when the issue is transient.
+                    return [1000, 3000, 6000, 10000][$attempt - 1] ?? 10000;
+                }, function ($exception) {
                     // Retry only on transient network failures, not on 4xx/5xx HTTP responses.
                     return $exception instanceof ConnectionException;
                 }, throw: true)
@@ -70,8 +73,8 @@ class GeminiClient
                         // Without this, residential/mobile NATs drop idle sockets after ~30s and
                         // the next read returns 0 bytes (cURL 52).
                         CURLOPT_TCP_KEEPALIVE => 1,
-                        CURLOPT_TCP_KEEPIDLE  => 15,
-                        CURLOPT_TCP_KEEPINTVL => 15,
+                        CURLOPT_TCP_KEEPIDLE  => 5,
+                        CURLOPT_TCP_KEEPINTVL => 5,
                     ],
                 ])
                 ->withHeaders([

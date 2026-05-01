@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Candidate;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Recruiter;
 use App\Models\User;
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('/locale/{locale}', [LocaleController::class, 'switch'])
+    ->whereIn('locale', ['en', 'my', 'jp'])
+    ->name('locale.switch');
 
 
 Route::get('/samples/resume', function () {
@@ -90,6 +95,10 @@ Route::middleware(['auth', 'role:candidate'])
         Route::get('/resumes/{resume}/export/csv', [Candidate\ExportController::class, 'reportCsv'])->name('resumes.export.csv');
         Route::get('/resumes/{resume}/export/draft', [Candidate\ExportController::class, 'improvedDraft'])->name('resumes.export.draft');
 
+        Route::get('/interview-questions', [Candidate\InterviewQuestionController::class, 'index'])->name('interview-questions.index');
+        Route::get('/interview-questions/{resume}', [Candidate\InterviewQuestionController::class, 'show'])->name('interview-questions.show');
+        Route::post('/interview-questions/{resume}', [Candidate\InterviewQuestionController::class, 'store'])->name('interview-questions.store');
+
         Route::get('/privacy', [Candidate\PrivacyController::class, 'edit'])->name('privacy.edit');
         Route::patch('/privacy', [Candidate\PrivacyController::class, 'update'])->name('privacy.update');
         Route::delete('/privacy/purge', [Candidate\PrivacyController::class, 'purge'])->name('privacy.purge');
@@ -110,6 +119,7 @@ Route::middleware(['auth', 'role:recruiter'])
         Route::get('/candidates/{resume}/download', [Recruiter\CandidateController::class, 'downloadResume'])->name('candidates.download');
         Route::post('/candidates/{resume}/compare', [Recruiter\CandidateController::class, 'compare'])->name('candidates.compare');
         Route::post('/candidates/{resume}/notes', [Recruiter\CandidateController::class, 'storeNote'])->name('candidates.notes.store');
+        Route::post('/candidates/{resume}/interview-questions', [Recruiter\InterviewQuestionController::class, 'store'])->name('candidates.interview-questions.store');
 
         Route::resource('jobs', Recruiter\JobPostingController::class)
             ->except(['show'])

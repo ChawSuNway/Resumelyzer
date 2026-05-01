@@ -204,14 +204,100 @@ php artisan test --coverage
 
 ## Key Directories
 
+### Application code
+
 ```
-app/Http/Controllers/Candidate/   — Resume upload, analysis, export
-app/Http/Controllers/Recruiter/   — Candidate browsing, job postings
-app/Http/Controllers/Admin/       — User management, settings
-app/Models/                        — Eloquent models
-app/Services/GeminiClient.php      — Google Gemini API integration
-resources/views/exports/           — PDF/Word export blade templates
-database/migrations/               — All database schemas
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Auth/                              — Laravel Breeze auth flow
+│   │   ├── Admin/                             — User mgmt, system settings, dashboards
+│   │   ├── Candidate/                         — Resume upload, analysis, export, interview Qs, privacy
+│   │   ├── Recruiter/                         — Candidate browsing, job postings, notes, comparisons
+│   │   └── LocaleController.php               — EN / MY / JP language switcher
+│   ├── Middleware/
+│   │   ├── EnsureUserHasRole.php              — Role gate (admin | recruiter | candidate)
+│   │   └── SetLocale.php                      — Applies session locale on every web request
+│   └── Requests/                              — Form-request validation classes
+├── Models/                                    — Eloquent models (User, Resume, JobPosting,
+│                                                ResumeAnalysis, RecruiterNote, ActivityLog,
+│                                                SystemSetting, InterviewQuestionSet)
+├── Services/
+│   ├── GeminiClient.php                       — Google Gemini HTTP client with retry, HTTP/1.1,
+│   │                                            TCP keepalive, Expect-disable for Myanmar networks
+│   ├── ResumeTextExtractor.php                — PDF / DOCX / TXT → plain text
+│   ├── ResumeAnalysisService.php              — Score breakdown + ATS feedback via Gemini
+│   └── InterviewQuestionService.php           — Tailored interview question generation
+├── Console/Commands/                          — Artisan commands (e.g. GenerateSampleResume)
+└── Providers/AppServiceProvider.php           — Service container bindings
+```
+
+### Frontend
+
+```
+resources/
+├── views/
+│   ├── layouts/                               — App + guest (auth) layouts, navigation
+│   ├── components/                            — Reusable Blade components
+│   │   ├── interview-questions.blade.php      — Tabbed question viewer
+│   │   ├── flag.blade.php                     — Inline-SVG locale flags (en/my/jp)
+│   │   ├── score-bar.blade.php / score-circle.blade.php
+│   │   └── application-logo.blade.php
+│   ├── auth/                                  — Login, register, password reset
+│   ├── candidate/                             — Dashboard, resumes, interview-questions, privacy
+│   ├── recruiter/                             — Dashboard, candidates, jobs
+│   ├── admin/                                 — Dashboard, users, settings
+│   ├── exports/                               — PDF export Blade templates
+│   └── welcome.blade.php                      — Public landing page
+├── css/app.css                                — Tailwind entry + [x-cloak] rule
+└── js/app.js                                  — Alpine.js + Vite entry
+```
+
+### Database & translations
+
+```
+database/
+├── migrations/                                — Schema migrations (users, resumes, job_postings,
+│                                                resume_analyses, recruiter_notes, system_settings,
+│                                                activity_logs, interview_question_sets)
+├── seeders/                                   — DatabaseSeeder
+├── factories/                                 — Model factories for tests / sample data
+└── database.sqlite                            — Default local SQLite DB
+
+lang/                                          — Per-locale translation files
+├── en/   nav.php, common.php
+├── my/   nav.php, common.php                  — Myanmar / Burmese
+└── jp/   nav.php, common.php                  — Japanese
+```
+
+### Routing & config
+
+```
+routes/
+├── web.php                                    — Public + role-grouped app routes
+├── auth.php                                   — Laravel Breeze auth routes
+└── console.php                                — Scheduled / artisan-triggered commands
+
+config/
+├── services.php                               — Gemini API + resume storage settings
+├── auth.php  database.php  filesystems.php  logging.php  session.php  …
+```
+
+### Public assets & storage
+
+```
+public/
+├── index.php                                  — Laravel front controller (do NOT delete)
+├── .htaccess  favicon.ico  robots.txt
+├── build/                                     — Vite-built JS/CSS assets
+├── samples/                                   — Sample resumes for the demo
+├── logo.png                                   — Brand logo (when used)
+└── storage  →  storage/app/public             — Symlink (php artisan storage:link)
+
+storage/
+├── app/private/resumes/{user_id}/             — Encrypted resume files (Crypt::encrypt)
+├── framework/{cache,sessions,views}/          — Laravel runtime state
+└── logs/laravel.log                           — Application log
 ```
 
 ---

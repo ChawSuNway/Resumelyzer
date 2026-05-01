@@ -50,7 +50,7 @@ class CandidateController extends Controller
     public function show(Request $request, Resume $resume)
     {
         abort_unless($resume->shared_with_recruiters, 403);
-        $resume->load(['user', 'analyses', 'latestAnalysis']);
+        $resume->load(['user', 'analyses', 'latestAnalysis', 'latestInterviewQuestionSet']);
 
         $notes = RecruiterNote::where('candidate_id', $resume->user_id)
             ->where('recruiter_id', $request->user()->id)
@@ -59,7 +59,9 @@ class CandidateController extends Controller
         $jobs = JobPosting::where('recruiter_id', $request->user()->id)
             ->where('is_active', true)->get();
 
-        return view('recruiter.candidates.show', compact('resume', 'notes', 'jobs'));
+        $interviewSet = $resume->latestInterviewQuestionSet;
+
+        return view('recruiter.candidates.show', compact('resume', 'notes', 'jobs', 'interviewSet'));
     }
 
     public function downloadResume(Request $request, Resume $resume)
