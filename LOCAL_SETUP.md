@@ -15,7 +15,7 @@
 ## 1. Clone the Repository
 
 ```bash
-git clone <repository-url> resumelyzer
+git clone git@github.com:ChawSuNway/Resumelyzer.git
 cd resumelyzer
 ```
 

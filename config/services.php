@@ -40,6 +40,8 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
         'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
         'timeout' => (int) env('GEMINI_TIMEOUT', 60),
+        'connect_timeout' => (int) env('GEMINI_CONNECT_TIMEOUT', 30),
+        'retries' => (int) env('GEMINI_RETRIES', 3),
     ],
 
     'resume' => [

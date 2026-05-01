@@ -9,6 +9,7 @@ use App\Models\Resume;
 use App\Services\ResumeAnalysisService;
 use App\Services\ResumeTextExtractor;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -117,8 +118,22 @@ class ResumeController extends Controller
     {
         $this->authorizeOwner($request, $resume);
         $disk = config('services.resume.disk', 'local');
+
+        if (! Storage::disk($disk)->exists($resume->stored_path)) {
+            return redirect()
+                ->route('candidate.resumes.show', $resume)
+                ->with('error', 'The original file is no longer available on the server. It may have been purged or removed.');
+        }
+
         $encrypted = Storage::disk($disk)->get($resume->stored_path);
-        $decrypted = Crypt::decrypt($encrypted);
+
+        try {
+            $decrypted = Crypt::decrypt($encrypted);
+        } catch (DecryptException $e) {
+            return redirect()
+                ->route('candidate.resumes.show', $resume)
+                ->with('error', 'Unable to decrypt this file. It may have been encrypted with a previous APP_KEY.');
+        }
 
         return response($decrypted, 200, [
             'Content-Type' => $resume->mime_type,

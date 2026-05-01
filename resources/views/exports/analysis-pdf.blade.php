@@ -130,10 +130,11 @@
     </div>
 
     {{-- ── Summary ── --}}
-    @if ($analysis->summary)
+    @php $summary = is_array($analysis->summary) ? implode(' ', array_filter($analysis->summary, 'is_scalar')) : (string) ($analysis->summary ?? ''); @endphp
+    @if ($summary !== '')
     <div class="section">
         <div class="section-title">Summary</div>
-        <div class="summary-box">{{ $analysis->summary }}</div>
+        <div class="summary-box">{{ $summary }}</div>
     </div>
     @endif
 
@@ -150,13 +151,13 @@
                 <td>
                     <div class="kw-title matched">&#10003; Matched ({{ count($matched) }})</div>
                     @foreach ($matched as $kw)
-                        <span class="tag tag-green">{{ $kw }}</span>
+                        <span class="tag tag-green">{{ is_array($kw) ? implode(' ', $kw) : (string) $kw }}</span>
                     @endforeach
                 </td>
                 <td>
                     <div class="kw-title missing">&#10005; Missing ({{ count($missing) }})</div>
                     @foreach ($missing as $kw)
-                        <span class="tag tag-red">{{ $kw }}</span>
+                        <span class="tag tag-red">{{ is_array($kw) ? implode(' ', $kw) : (string) $kw }}</span>
                     @endforeach
                 </td>
             </tr>
@@ -171,7 +172,7 @@
         <div class="section-title">Strengths</div>
         <ul class="fb-list">
             @foreach ($strengths as $s)
-                <li>{{ $s }}</li>
+                <li>{{ is_array($s) ? implode(' ', array_filter($s, 'is_scalar')) : (string) $s }}</li>
             @endforeach
         </ul>
     </div>
@@ -184,7 +185,7 @@
         <div class="section-title">Areas for Improvement</div>
         <ul class="fb-list">
             @foreach ($weaknesses as $w)
-                <li>{{ $w }}</li>
+                <li>{{ is_array($w) ? implode(' ', array_filter($w, 'is_scalar')) : (string) $w }}</li>
             @endforeach
         </ul>
     </div>
@@ -201,9 +202,15 @@
                 <th>Tip</th>
             </tr>
             @foreach ($suggestions as $s)
+                @php
+                    $area = $s['area'] ?? '—';
+                    $tip  = $s['tip']  ?? '—';
+                    if (is_array($area)) $area = implode(' ', array_filter($area, 'is_scalar'));
+                    if (is_array($tip))  $tip  = implode(' ', array_filter($tip,  'is_scalar'));
+                @endphp
                 <tr>
-                    <td>{{ $s['area'] ?? '—' }}</td>
-                    <td>{{ $s['tip']  ?? '—' }}</td>
+                    <td>{{ (string) $area }}</td>
+                    <td>{{ (string) $tip }}</td>
                 </tr>
             @endforeach
         </table>
@@ -211,11 +218,39 @@
     @endif
 
     {{-- ── Flags ── --}}
-    @php $flags = $analysis->flags ?? []; @endphp
-    @if (count($flags))
+    @php
+        $flags = $analysis->flags ?? [];
+        $flagLabels = [
+            'missing_dates'              => 'Missing dates',
+            'no_measurable_achievements' => 'No measurable achievements',
+            'long_paragraphs'            => 'Long paragraphs',
+            'passive_voice_overuse'      => 'Passive voice overuse',
+        ];
+        $flagItems = [];
+        foreach ($flagLabels as $key => $label) {
+            if (! empty($flags[$key])) {
+                $flagItems[] = $label;
+            }
+        }
+        foreach ((array) ($flags['section_order_issues'] ?? []) as $issue) {
+            if (is_string($issue) && $issue !== '') {
+                $flagItems[] = 'Section order: '.$issue;
+            }
+        }
+        // Also surface any unknown flags (string values or true booleans) the AI may add.
+        foreach ($flags as $k => $v) {
+            if (array_key_exists($k, $flagLabels) || $k === 'section_order_issues') continue;
+            if (is_bool($v) && $v) $flagItems[] = ucfirst(str_replace('_', ' ', (string) $k));
+            elseif (is_string($v) && $v !== '') $flagItems[] = $v;
+            elseif (is_array($v)) {
+                foreach ($v as $vv) if (is_string($vv) && $vv !== '') $flagItems[] = $vv;
+            }
+        }
+    @endphp
+    @if (count($flagItems))
     <div class="section">
         <div class="section-title">Flags &amp; Warnings</div>
-        @foreach ($flags as $flag)
+        @foreach ($flagItems as $flag)
             <span class="flag-item">&#9888; {{ $flag }}</span>
         @endforeach
     </div>

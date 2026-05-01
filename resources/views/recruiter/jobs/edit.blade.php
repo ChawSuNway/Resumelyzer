@@ -22,7 +22,12 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('recruiter.jobs.update', $job) }}" class="space-y-5">
+            <form id="job-delete-form" method="POST" action="{{ route('recruiter.jobs.destroy', $job) }}"
+                  onsubmit="return confirm('Permanently delete this job posting?')" class="hidden">
+                @csrf @method('DELETE')
+            </form>
+
+            <form id="job-update-form" method="POST" action="{{ route('recruiter.jobs.update', $job) }}" class="space-y-5">
                 @csrf @method('PATCH')
 
                 <div>
@@ -67,11 +72,7 @@
                 </div>
 
                 <div class="flex justify-between items-center pt-2">
-                    <form method="POST" action="{{ route('recruiter.jobs.destroy', $job) }}"
-                          onsubmit="return confirm('Permanently delete this job posting?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="text-sm text-rose-600 hover:underline">Delete posting</button>
-                    </form>
+                    <button type="submit" form="job-delete-form" class="text-sm text-rose-600 hover:underline">Delete posting</button>
                     <div class="flex gap-3">
                         <a href="{{ route('recruiter.jobs.index') }}" class="px-4 py-2 rounded-md bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200">Cancel</a>
                         <x-primary-button>Save Changes</x-primary-button>

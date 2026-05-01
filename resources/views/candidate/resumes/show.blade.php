@@ -17,6 +17,9 @@
         @if (session('status'))
             <div class="rounded-md bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 text-sm">{{ session('status') }}</div>
         @endif
+        @if (session('error'))
+            <div class="rounded-md bg-red-50 border border-red-200 p-4 text-red-800 text-sm">{{ session('error') }}</div>
+        @endif
 
         @if (! $analysis || ! $analysis->isComplete())
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

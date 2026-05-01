@@ -10,6 +10,9 @@
         @if (session('status'))
             <div class="rounded-md bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 text-sm mb-5">{{ session('status') }}</div>
         @endif
+        @if (session('error'))
+            <div class="rounded-md bg-red-50 border border-red-200 p-4 text-red-800 text-sm mb-5">{{ session('error') }}</div>
+        @endif
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <table class="w-full text-sm">

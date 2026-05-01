@@ -57,13 +57,18 @@ class JobPostingController extends Controller
 
     private function validated(Request $request): array
     {
-        return $request->validate([
+        $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],
             'location' => ['nullable', 'string', 'max:255'],
             'description' => ['required', 'string'],
             'is_active' => ['nullable', 'boolean'],
-        ]) + ['is_active' => (bool) $request->input('is_active', true)];
+        ]);
+
+        // Unchecked checkboxes are absent from the request — treat that as inactive.
+        $data['is_active'] = $request->boolean('is_active');
+
+        return $data;
     }
 
     private function splitKeywords(?string $raw): array

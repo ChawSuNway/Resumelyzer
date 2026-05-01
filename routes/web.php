@@ -111,7 +111,13 @@ Route::middleware(['auth', 'role:recruiter'])
         Route::post('/candidates/{resume}/compare', [Recruiter\CandidateController::class, 'compare'])->name('candidates.compare');
         Route::post('/candidates/{resume}/notes', [Recruiter\CandidateController::class, 'storeNote'])->name('candidates.notes.store');
 
-        Route::resource('jobs', Recruiter\JobPostingController::class)->except(['show']);
+        Route::resource('jobs', Recruiter\JobPostingController::class)
+            ->except(['show'])
+            ->missing(function () {
+                return redirect()
+                    ->route('recruiter.jobs.index')
+                    ->with('error', 'That job posting no longer exists — it may have been deleted.');
+            });
     });
 
 /*

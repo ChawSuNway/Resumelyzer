@@ -13,6 +13,9 @@
         @if (session('status'))
             <div class="rounded-md bg-emerald-50 border border-emerald-200 p-4 text-emerald-800 text-sm">{{ session('status') }}</div>
         @endif
+        @if (session('error'))
+            <div class="rounded-md bg-red-50 border border-red-200 p-4 text-red-800 text-sm">{{ session('error') }}</div>
+        @endif
 
         <div class="grid md:grid-cols-3 gap-6">
             {{-- Analysis score --}}
@@ -113,7 +116,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 class="text-base font-semibold text-gray-900 mb-4">My Notes</h3>
 
-            <form method="POST" action="{{ route('recruiter.candidates.notes', $resume) }}" class="space-y-4 mb-6">
+            <form method="POST" action="{{ route('recruiter.candidates.notes.store', $resume) }}" class="space-y-4 mb-6">
                 @csrf
                 <div class="flex gap-4 items-center">
                     <label class="text-sm font-medium text-gray-700 shrink-0">Rating (1–5)</label>

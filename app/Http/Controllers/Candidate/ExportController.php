@@ -42,8 +42,9 @@ class ExportController extends Controller
             fputcsv($out, ['Missing Keywords', implode(', ', $analysis->keyword_match['missing'] ?? [])]);
             fputcsv($out, ['Strengths', implode(' | ', $analysis->feedback['strengths'] ?? [])]);
             fputcsv($out, ['Weaknesses', implode(' | ', $analysis->feedback['weaknesses'] ?? [])]);
+            $flatten = fn ($v) => is_array($v) ? implode(' ', array_filter($v, 'is_scalar')) : (string) ($v ?? '');
             $suggestions = collect($analysis->feedback['suggestions'] ?? [])
-                ->map(fn ($s) => ($s['area'] ?? '').': '.($s['tip'] ?? ''))->implode(' | ');
+                ->map(fn ($s) => $flatten($s['area'] ?? '').': '.$flatten($s['tip'] ?? ''))->implode(' | ');
             fputcsv($out, ['Suggestions', $suggestions]);
             fclose($out);
         }, $filename, ['Content-Type' => 'text/csv']);
