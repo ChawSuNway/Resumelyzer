@@ -14,11 +14,15 @@
                             <x-nav-link :href="route('candidate.dashboard')" :active="request()->routeIs('candidate.dashboard')">{{ __('nav.dashboard') }}</x-nav-link>
                             <x-nav-link :href="route('candidate.resumes.index')" :active="request()->routeIs('candidate.resumes.*')">{{ __('nav.my_resumes') }}</x-nav-link>
                             <x-nav-link :href="route('candidate.resumes.create')" :active="request()->routeIs('candidate.resumes.create')">{{ __('nav.upload') }}</x-nav-link>
-                            <x-nav-link :href="route('candidate.interview-questions.index')" :active="request()->routeIs('candidate.interview-questions.*')">{{ __('nav.interview_questions') }}</x-nav-link>
+                            @if (\App\Support\Modules::enabled('interview_questions'))
+                                <x-nav-link :href="route('candidate.interview-questions.index')" :active="request()->routeIs('candidate.interview-questions.*')">{{ __('nav.interview_questions') }}</x-nav-link>
+                            @endif
                             <x-nav-link :href="route('candidate.privacy.edit')" :active="request()->routeIs('candidate.privacy.*')">{{ __('nav.privacy') }}</x-nav-link>
                         @elseif (auth()->user()->isRecruiter())
                             <x-nav-link :href="route('recruiter.dashboard')" :active="request()->routeIs('recruiter.dashboard')">{{ __('nav.dashboard') }}</x-nav-link>
-                            <x-nav-link :href="route('recruiter.candidates.index')" :active="request()->routeIs('recruiter.candidates.*')">{{ __('nav.candidates') }}</x-nav-link>
+                            @if (\App\Support\Modules::enabled('recruiter_access'))
+                                <x-nav-link :href="route('recruiter.candidates.index')" :active="request()->routeIs('recruiter.candidates.*')">{{ __('nav.candidates') }}</x-nav-link>
+                            @endif
                             <x-nav-link :href="route('recruiter.jobs.index')" :active="request()->routeIs('recruiter.jobs.*')">{{ __('nav.job_postings') }}</x-nav-link>
                         @elseif (auth()->user()->isAdmin())
                             <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">{{ __('nav.dashboard') }}</x-nav-link>
@@ -91,11 +95,15 @@
                     <x-responsive-nav-link :href="route('candidate.dashboard')">{{ __('nav.dashboard') }}</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('candidate.resumes.index')">{{ __('nav.my_resumes') }}</x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('candidate.resumes.create')">{{ __('nav.upload') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('candidate.interview-questions.index')">{{ __('nav.interview_questions') }}</x-responsive-nav-link>
+                    @if (\App\Support\Modules::enabled('interview_questions'))
+                        <x-responsive-nav-link :href="route('candidate.interview-questions.index')">{{ __('nav.interview_questions') }}</x-responsive-nav-link>
+                    @endif
                     <x-responsive-nav-link :href="route('candidate.privacy.edit')">{{ __('nav.privacy') }}</x-responsive-nav-link>
                 @elseif (auth()->user()->isRecruiter())
                     <x-responsive-nav-link :href="route('recruiter.dashboard')">{{ __('nav.dashboard') }}</x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('recruiter.candidates.index')">{{ __('nav.candidates') }}</x-responsive-nav-link>
+                    @if (\App\Support\Modules::enabled('recruiter_access'))
+                        <x-responsive-nav-link :href="route('recruiter.candidates.index')">{{ __('nav.candidates') }}</x-responsive-nav-link>
+                    @endif
                     <x-responsive-nav-link :href="route('recruiter.jobs.index')">{{ __('nav.job_postings') }}</x-responsive-nav-link>
                 @elseif (auth()->user()->isAdmin())
                     <x-responsive-nav-link :href="route('admin.dashboard')">{{ __('nav.dashboard') }}</x-responsive-nav-link>

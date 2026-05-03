@@ -53,41 +53,54 @@ class GeminiClient
             /** @var Response $response */
             $response = Http::timeout($timeout)
                 ->connectTimeout($connectTimeout)
-                ->retry(max(1, $retries), function (int $attempt) {
-                    // Exponential-ish backoff: 1s, 3s, 6s, 10s. Helps when the issue is transient.
-                    return [1000, 3000, 6000, 10000][$attempt - 1] ?? 10000;
+                ->retry(max(1, $retries), function (int $attempt, $exception) {
+                    // Exponential backoff: 2s, 5s, 10s, 20s …
+                    // Longer delays give Google's 503 backend time to recover.
+                    $delay = [2000, 5000, 10000, 20000][$attempt - 1] ?? 20000;
+
+                    // Extra pause for 503 — server is overloaded, hammering it faster makes it worse.
+                    if ($exception instanceof \Illuminate\Http\Client\RequestException
+                        && $exception->response?->status() === 503) {
+                        return $delay * 2;
+                    }
+
+                    return $delay;
                 }, function ($exception) {
-                    // Retry only on transient network failures, not on 4xx/5xx HTTP responses.
-                    return $exception instanceof ConnectionException;
+                    // Retry on any transient network failure OR on HTTP 503 (server overload).
+                    if ($exception instanceof ConnectionException) {
+                        return true;
+                    }
+                    if ($exception instanceof \Illuminate\Http\Client\RequestException) {
+                        return $exception->response?->status() === 503;
+                    }
+                    return false;
                 }, throw: true)
                 ->withOptions([
-                    // Disable "Expect: 100-continue" — Guzzle adds it for bodies >1KB, but
-                    // middleboxes and some Google frontends drop the connection instead of
-                    // replying, which surfaces as cURL 52 "Empty reply from server".
                     'expect' => false,
                     'curl' => [
-                        // Force HTTP/1.1 — middleboxes/ISPs in some regions break HTTP/2 to Google,
-                        // which surfaces as cURL 52 "Empty reply from server".
+                        // Force HTTP/1.1. Middleboxes and some regional ISPs break HTTP/2 to
+                        // Google, causing cURL 52 "Empty reply from server".
                         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        // Keep the TCP connection alive while Gemini is generating the response.
-                        // Without this, residential/mobile NATs drop idle sockets after ~30s and
-                        // the next read returns 0 bytes (cURL 52).
+
+                        // TCP keepalives prevent NAT/firewall devices from evicting the
+                        // connection mid-response on long Gemini generations.
                         CURLOPT_TCP_KEEPALIVE => 1,
-                        CURLOPT_TCP_KEEPIDLE  => 5,
+                        CURLOPT_TCP_KEEPIDLE  => 10,
                         CURLOPT_TCP_KEEPINTVL => 5,
                     ],
                 ])
                 ->withHeaders([
                     'x-goog-api-key' => $apiKey,
-                    // Belt-and-braces: explicitly empty Expect overrides any client default.
-                    'Expect' => '',
+                    'Expect'         => '',
+                    'User-Agent'     => 'Resumelyzer/1.0 (GeminiClient; PHP/'.PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION.')',
                 ])
                 ->acceptJson()
                 ->post($url, $body);
         } catch (ConnectionException $e) {
             throw new RuntimeException(
-                'Gemini API unreachable after '.max(1, $retries).' attempts: '.$e->getMessage().
-                ' — check your internet connection or try again; the Generative Language endpoint may be intermittently blocked.',
+                'Gemini API unreachable after '.max(1, $retries).' attempts: '.$e->getMessage()
+                .' — Check your internet connection. If the issue persists, the Generative Language'
+                .' endpoint may be blocked or throttled by your ISP.',
                 0,
                 $e
             );

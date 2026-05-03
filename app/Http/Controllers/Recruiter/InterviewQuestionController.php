@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\JobPosting;
 use App\Models\Resume;
 use App\Services\InterviewQuestionService;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -18,6 +19,7 @@ class InterviewQuestionController extends Controller
 
     public function store(Request $request, Resume $resume)
     {
+        abort_unless(Modules::enabled('interview_questions'), 503, 'The Interview Question Generator is currently disabled.');
         abort_unless($resume->shared_with_recruiters, 403);
 
         $validated = $request->validate([

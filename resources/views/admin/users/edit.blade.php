@@ -40,13 +40,6 @@
                 </div>
 
                 <div>
-                    <x-input-label for="password" value="New Password" />
-                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
-                                  placeholder="Leave blank to keep current password" />
-                    <x-input-error :messages="$errors->get('password')" class="mt-2" />
-                </div>
-
-                <div>
                     <x-input-label for="role" value="Role" />
                     <select id="role" name="role" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                         <option value="candidate" {{ old('role', $user->role) === 'candidate' ? 'selected' : '' }}>Candidate</option>
@@ -85,6 +78,45 @@
                     {{ $user->is_active ? 'bg-amber-100 text-amber-700 hover:bg-amber-200' : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' }}">
                     {{ $user->is_active ? 'Deactivate this user' : 'Reactivate this user' }}
                 </button>
+            </form>
+        </div>
+
+        {{-- Reset Password --}}
+        <div class="mt-4 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 class="text-sm font-semibold text-gray-800 mb-1">Reset Password</h3>
+            <p class="text-xs text-gray-500 mb-4">Set a new password for this user. They will need to use it on their next login.</p>
+
+            @if ($errors->hasBag('resetPassword'))
+                <div class="rounded-md bg-rose-50 border border-rose-200 p-3 text-rose-800 text-sm mb-4">
+                    <ul class="list-disc pl-5 space-y-1">
+                        @foreach ($errors->getBag('resetPassword')->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('admin.users.password', $user) }}" class="space-y-4">
+                @csrf @method('PATCH')
+
+                <div>
+                    <x-input-label for="password" value="New Password" />
+                    <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
+                                  placeholder="Min 8 characters" autocomplete="new-password" />
+                </div>
+
+                <div>
+                    <x-input-label for="password_confirmation" value="Confirm Password" />
+                    <x-text-input id="password_confirmation" name="password_confirmation" type="password"
+                                  class="mt-1 block w-full" placeholder="Repeat new password" autocomplete="new-password" />
+                </div>
+
+                <div class="flex justify-end">
+                    <button type="submit"
+                            class="px-4 py-2 rounded-md bg-rose-600 text-white text-sm font-medium hover:bg-rose-700">
+                        Reset Password
+                    </button>
+                </div>
             </form>
         </div>
     </div>

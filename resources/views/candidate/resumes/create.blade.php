@@ -5,7 +5,10 @@
 
     <div class="py-8 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <p class="text-sm text-gray-600 mb-4">Upload a PDF, DOCX, or TXT resume. We'll extract the text, encrypt the original, and run an analysis powered by Google Gemini.</p>
+            @php
+                $formatsDisplay = collect($allowedFormats)->map(fn($f) => strtoupper($f))->implode(', ');
+            @endphp
+            <p class="text-sm text-gray-600 mb-4">Upload your resume and we'll extract the text, encrypt the original, and run an AI-powered analysis.</p>
             <p class="text-xs text-gray-500 mb-6">
                 Don't have a resume handy?
                 <a href="{{ route('sample.resume') }}" class="text-indigo-600 hover:underline" download>Download our sample resume</a>
@@ -28,9 +31,12 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Resume file</label>
                     <input type="file" name="resume" required
-                           accept=".pdf,.doc,.docx,.txt"
+                           accept="{{ collect($allowedFormats)->map(fn($f) => '.' . $f)->implode(',') }}"
                            class="block w-full text-sm text-gray-700 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
-                    <p class="mt-1 text-xs text-gray-500">PDF, DOC/DOCX, or TXT. Max 10 MB.</p>
+                    <p class="mt-1 text-xs text-gray-500">
+                        Accepted: {{ $formatsDisplay }}.
+                        Max size: {{ $uploadMaxMb }} MB.
+                    </p>
                 </div>
 
                 <div>

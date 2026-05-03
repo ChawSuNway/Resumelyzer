@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use App\Models\JobPosting;
 use App\Models\Resume;
 use App\Services\InterviewQuestionService;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Throwable;
 
@@ -16,8 +17,14 @@ class InterviewQuestionController extends Controller
     {
     }
 
+    private function requireModule(): void
+    {
+        abort_unless(Modules::enabled('interview_questions'), 503, 'The Interview Question Generator is currently disabled.');
+    }
+
     public function index(Request $request)
     {
+        $this->requireModule();
         $resumes = $request->user()->resumes()
             ->with('latestInterviewQuestionSet', 'latestAnalysis')
             ->latest()
@@ -28,6 +35,7 @@ class InterviewQuestionController extends Controller
 
     public function show(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->user_id === $request->user()->id, 403);
         $resume->load('latestAnalysis.jobPosting', 'latestInterviewQuestionSet');
 
@@ -39,6 +47,7 @@ class InterviewQuestionController extends Controller
 
     public function store(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->user_id === $request->user()->id, 403);
 
         $validated = $request->validate([

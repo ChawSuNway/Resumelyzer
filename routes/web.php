@@ -145,6 +145,7 @@ Route::middleware(['auth', 'role:admin'])
         Route::post('/users', [Admin\UserController::class, 'store'])->name('users.store');
         Route::get('/users/{user}/edit', [Admin\UserController::class, 'edit'])->name('users.edit');
         Route::patch('/users/{user}', [Admin\UserController::class, 'update'])->name('users.update');
+        Route::patch('/users/{user}/password', [Admin\UserController::class, 'resetPassword'])->name('users.password');
         Route::patch('/users/{user}/toggle', [Admin\UserController::class, 'deactivate'])->name('users.toggle');
 
         Route::get('/settings', [Admin\SettingsController::class, 'edit'])->name('settings.edit');

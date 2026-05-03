@@ -113,6 +113,7 @@
         @endif
 
         {{-- AI-powered interview questions --}}
+        @if (\App\Support\Modules::enabled('interview_questions'))
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <div class="flex justify-between items-start gap-4">
                 <div>
@@ -138,6 +139,7 @@
 
         @if ($interviewSet)
             <x-interview-questions :set="$interviewSet" />
+        @endif
         @endif
 
         {{-- Recruiter notes --}}

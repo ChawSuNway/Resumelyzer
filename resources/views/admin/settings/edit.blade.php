@@ -80,6 +80,99 @@
                 <x-input-error :messages="$errors->get('retention_days')" class="mt-1" />
             </div>
 
+            {{-- Modules --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-4">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">Feature Modules</h3>
+                    <p class="text-sm text-gray-500 mt-1">Enable or disable platform features. Disabled modules are hidden from users and their routes return a 503 error.</p>
+                </div>
+
+                @php
+                    $enabledModules = old('enabled_modules', $settings['enabled_modules'] ?? array_keys(\App\Support\Modules::ALL));
+                @endphp
+
+                <div class="space-y-3">
+                    @foreach (\App\Support\Modules::ALL as $key => $meta)
+                    @php $isEnabled = in_array($key, (array) $enabledModules); @endphp
+                    <label class="flex items-start gap-4 p-4 rounded-lg border cursor-pointer transition
+                                  {{ $isEnabled ? 'border-indigo-200 bg-indigo-50' : 'border-gray-200 bg-gray-50' }}">
+                        <div class="flex items-center h-5 mt-0.5">
+                            <input type="checkbox"
+                                   name="enabled_modules[]"
+                                   value="{{ $key }}"
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                   {{ $isEnabled ? 'checked' : '' }}>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-semibold text-gray-900">{{ $meta['label'] }}</p>
+                            <p class="text-xs text-gray-500 mt-0.5">{{ $meta['description'] }}</p>
+                        </div>
+                        <span class="shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full
+                                     {{ $isEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-200 text-gray-500' }}">
+                            {{ $isEnabled ? 'Enabled' : 'Disabled' }}
+                        </span>
+                    </label>
+                    @endforeach
+                </div>
+                <p class="text-xs text-gray-400">Unchecking a module disables it immediately after saving.</p>
+            </div>
+
+            {{-- Resume Upload Limits --}}
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-5">
+                <div>
+                    <h3 class="text-base font-semibold text-gray-900">Resume Upload Limits</h3>
+                    <p class="text-sm text-gray-500 mt-1">Control the maximum file size and which formats candidates are allowed to upload.</p>
+                </div>
+
+                {{-- Max size --}}
+                <div>
+                    <label for="upload_max_size_mb" class="block text-sm font-medium text-gray-700 mb-1">Maximum file size</label>
+                    <div class="flex items-center gap-2">
+                        <x-text-input id="upload_max_size_mb" name="upload_max_size_mb" type="number"
+                                      min="1" max="50" step="1" class="block w-24"
+                                      :value="old('upload_max_size_mb', $settings['upload_max_size_mb'] ?? 10)" />
+                        <span class="text-sm text-gray-500">MB &nbsp;(max 50 MB)</span>
+                    </div>
+                    <x-input-error :messages="$errors->get('upload_max_size_mb')" class="mt-1" />
+                </div>
+
+                {{-- Allowed formats --}}
+                <div>
+                    <p class="block text-sm font-medium text-gray-700 mb-2">Supported formats</p>
+                    @if ($errors->get('upload_allowed_formats') || $errors->get('upload_allowed_formats.*'))
+                        <p class="text-sm text-rose-600 mb-2">Please select at least one format.</p>
+                    @endif
+                    @php
+                        $formatLabels = [
+                            'pdf'  => ['label' => 'PDF',               'ext' => '.pdf',  'note' => 'Recommended'],
+                            'docx' => ['label' => 'Word (.docx)',       'ext' => '.docx', 'note' => ''],
+                            'doc'  => ['label' => 'Word legacy (.doc)', 'ext' => '.doc',  'note' => ''],
+                            'txt'  => ['label' => 'Plain text (.txt)',  'ext' => '.txt',  'note' => ''],
+                            'rtf'  => ['label' => 'Rich Text (.rtf)',   'ext' => '.rtf',  'note' => ''],
+                            'odt'  => ['label' => 'OpenDocument (.odt)','.ext' => '.odt', 'note' => ''],
+                        ];
+                        $savedFormats = old('upload_allowed_formats', $settings['upload_allowed_formats'] ?? ['pdf','docx','doc','txt']);
+                    @endphp
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        @foreach ($formatLabels as $fmt => $meta)
+                        <label class="flex items-center gap-2.5 p-3 rounded-lg border cursor-pointer transition
+                                      {{ in_array($fmt, (array) $savedFormats) ? 'border-indigo-300 bg-indigo-50' : 'border-gray-200 bg-white hover:border-gray-300' }}">
+                            <input type="checkbox" name="upload_allowed_formats[]" value="{{ $fmt }}"
+                                   class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                                   {{ in_array($fmt, (array) $savedFormats) ? 'checked' : '' }}>
+                            <div>
+                                <span class="text-sm font-medium text-gray-800 p-2">{{ $meta['label'] }}</span>
+                                @if ($meta['note'])
+                                    <span class="ml-1 text-[10px] font-semibold text-indigo-600 uppercase tracking-wide">{{ $meta['note'] }}</span>
+                                @endif
+                            </div>
+                        </label>
+                        @endforeach
+                    </div>
+                    <p class="mt-2 text-xs text-gray-400">At least one format must be selected. Changes apply immediately to new uploads.</p>
+                </div>
+            </div>
+
             <div class="flex justify-end">
                 <x-primary-button>Save Settings</x-primary-button>
             </div>

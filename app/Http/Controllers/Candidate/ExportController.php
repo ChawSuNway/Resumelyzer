@@ -4,14 +4,21 @@ namespace App\Http\Controllers\Candidate;
 
 use App\Http\Controllers\Controller;
 use App\Models\Resume;
+use App\Support\Modules;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ExportController extends Controller
 {
+    private function requireModule(): void
+    {
+        abort_unless(Modules::enabled('resume_export'), 503, 'Resume export is currently disabled.');
+    }
+
     public function reportPdf(Request $request, Resume $resume)
     {
+        $this->requireModule();
         $this->authorizeOwner($request, $resume);
         $analysis = $resume->latestAnalysis;
         abort_unless($analysis, 404, 'No analysis available.');
@@ -22,6 +29,7 @@ class ExportController extends Controller
 
     public function reportCsv(Request $request, Resume $resume): StreamedResponse
     {
+        $this->requireModule();
         $this->authorizeOwner($request, $resume);
         $analysis = $resume->latestAnalysis;
         abort_unless($analysis, 404, 'No analysis available.');
@@ -52,6 +60,7 @@ class ExportController extends Controller
 
     public function improvedDraft(Request $request, Resume $resume)
     {
+        $this->requireModule();
         $this->authorizeOwner($request, $resume);
         $analysis = $resume->latestAnalysis;
         abort_unless($analysis, 404, 'No analysis available.');

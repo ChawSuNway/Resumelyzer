@@ -85,6 +85,20 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('status', 'User updated.');
     }
 
+    public function resetPassword(Request $request, User $user)
+    {
+        $request->validateWithBag('resetPassword', [
+            'password'              => ['required', 'string', 'min:8', 'confirmed'],
+            'password_confirmation' => ['required'],
+        ]);
+
+        $user->update(['password' => Hash::make($request->password)]);
+
+        ActivityLog::record('admin.user.password_reset', $user);
+
+        return back()->with('status', 'Password has been reset successfully.');
+    }
+
     public function deactivate(Request $request, User $user)
     {
         abort_if($user->id === $request->user()->id, 422, 'You cannot deactivate yourself.');

@@ -9,6 +9,7 @@ use App\Models\RecruiterNote;
 use App\Models\Resume;
 use App\Models\User;
 use App\Services\ResumeAnalysisService;
+use App\Support\Modules;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Support\Facades\Crypt;
@@ -16,12 +17,16 @@ use Illuminate\Support\Facades\Storage;
 
 class CandidateController extends Controller
 {
-    public function __construct(private readonly ResumeAnalysisService $analyzer)
+    public function __construct(private readonly ResumeAnalysisService $analyzer) {}
+
+    private function requireModule(): void
     {
+        abort_unless(Modules::enabled('recruiter_access'), 503, 'Recruiter candidate access is currently disabled.');
     }
 
     public function index(Request $request)
     {
+        $this->requireModule();
         $query = Resume::query()
             ->where('shared_with_recruiters', true)
             ->with(['user', 'latestAnalysis']);
@@ -49,6 +54,7 @@ class CandidateController extends Controller
 
     public function show(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->shared_with_recruiters, 403);
         $resume->load(['user', 'analyses', 'latestAnalysis', 'latestInterviewQuestionSet']);
 
@@ -66,6 +72,7 @@ class CandidateController extends Controller
 
     public function downloadResume(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->shared_with_recruiters, 403);
         $disk = config('services.resume.disk', 'local');
 
@@ -95,6 +102,7 @@ class CandidateController extends Controller
 
     public function compare(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->shared_with_recruiters, 403);
 
         $request->validate(['job_posting_id' => ['required', 'exists:job_postings,id']]);
@@ -114,6 +122,7 @@ class CandidateController extends Controller
 
     public function storeNote(Request $request, Resume $resume)
     {
+        $this->requireModule();
         abort_unless($resume->shared_with_recruiters, 403);
 
         $validated = $request->validate([

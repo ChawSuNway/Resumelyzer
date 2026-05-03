@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\JobPosting;
 use App\Models\Resume;
+use App\Models\SystemSetting;
 use App\Services\ResumeAnalysisService;
 use App\Services\ResumeTextExtractor;
 use Illuminate\Http\Request;
@@ -30,16 +31,21 @@ class ResumeController extends Controller
 
     public function create(Request $request)
     {
-        $jobs = JobPosting::where('is_active', true)->latest()->get();
-        return view('candidate.resumes.create', compact('jobs'));
+        $jobs           = JobPosting::where('is_active', true)->latest()->get();
+        $uploadMaxMb    = (int) SystemSetting::get('upload_max_size_mb', 10);
+        $allowedFormats = (array) SystemSetting::get('upload_allowed_formats', ['pdf', 'docx', 'doc', 'txt']);
+        return view('candidate.resumes.create', compact('jobs', 'uploadMaxMb', 'allowedFormats'));
     }
 
     public function store(Request $request)
     {
-        $maxKb = (int) config('services.resume.max_size_kb', 10240);
+        $maxMb          = (int) SystemSetting::get('upload_max_size_mb', 10);
+        $maxKb          = $maxMb * 1024;
+        $allowedFormats = (array) SystemSetting::get('upload_allowed_formats', ['pdf', 'docx', 'doc', 'txt']);
+        $mimesList      = implode(',', $allowedFormats);
 
         $validated = $request->validate([
-            'resume' => ['required', 'file', "max:{$maxKb}", 'mimes:pdf,doc,docx,txt'],
+            'resume'         => ['required', 'file', "max:{$maxKb}", "mimes:{$mimesList}"],
             'job_posting_id' => ['nullable', 'exists:job_postings,id'],
         ]);
 

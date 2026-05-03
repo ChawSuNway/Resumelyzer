@@ -4,10 +4,9 @@
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $resume->original_filename }}</h2>
             <div class="space-x-2 text-sm">
                 <a href="{{ route('candidate.resumes.download', $resume) }}" class="text-indigo-600 hover:underline">Download original</a>
-                @if ($analysis?->isComplete())
+                @if (\App\Support\Modules::enabled('resume_export') && $analysis?->isComplete())
                     <a href="{{ route('candidate.resumes.export.pdf', $resume) }}" class="text-indigo-600 hover:underline">Export PDF</a>
                     <a href="{{ route('candidate.resumes.export.csv', $resume) }}" class="text-indigo-600 hover:underline">Export CSV</a>
-                    {{-- <a href="{{ route('candidate.resumes.export.draft', $resume) }}" class="text-indigo-600 hover:underline">Improved draft</a> --}}
                 @endif
             </div>
         </div>
@@ -40,6 +39,7 @@
         @else
             @include('candidate.resumes.analysis', ['analysis' => $analysis, 'resume' => $resume])
 
+            @if (\App\Support\Modules::enabled('interview_questions'))
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex justify-between items-center gap-4">
                 <div>
                     <h3 class="text-base font-semibold text-gray-900">AI-Powered Interview Questions</h3>
@@ -50,6 +50,7 @@
                     Open
                 </a>
             </div>
+            @endif
         @endif
     </div>
 </x-app-layout>
